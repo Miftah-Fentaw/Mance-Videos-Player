@@ -30,7 +30,7 @@ class _BrowsePageState extends State<BrowsePage> {
   void _loadUrl(String url) {
     Uri uri = Uri.parse(url);
     if (!uri.isAbsolute) {
-      uri = Uri.parse("https://www.google.com/search?q=$url");
+      uri = Uri.parse("https://www.youtube.com/search?q=$url");
     }
     _webViewController?.loadUrl(urlRequest: URLRequest(url: WebUri.uri(uri)));
   }
@@ -53,7 +53,10 @@ class _BrowsePageState extends State<BrowsePage> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: Colors.grey[200],
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide: BorderSide.none,
@@ -71,7 +74,9 @@ class _BrowsePageState extends State<BrowsePage> {
 
             Expanded(
               child: InAppWebView(
-                initialUrlRequest: URLRequest(url: WebUri("https://www.Youtube.com")),
+                initialUrlRequest: URLRequest(
+                  url: WebUri("https://www.Youtube.com"),
+                ),
                 pullToRefreshController: _pullToRefreshController,
                 onWebViewCreated: (controller) {
                   _webViewController = controller;
@@ -103,15 +108,41 @@ class _BrowsePageState extends State<BrowsePage> {
         ),
       ),
       bottomNavigationBar: Container(
-        height: 55,
+        height: 30,
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            IconButton(icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 22), onPressed: () => _webViewController?.goBack()),
-            IconButton(icon: const Icon(Icons.arrow_forward_ios, color: Colors.black, size: 22), onPressed: () => _webViewController?.goForward()),
-            IconButton(icon: const Icon(Icons.refresh, color: Colors.black, size: 28), onPressed: () => _webViewController?.reload()),
-            IconButton(icon: const Icon(Icons.home_outlined, color: Colors.black, size: 28), onPressed: () => _webViewController?.loadUrl(urlRequest: URLRequest(url: WebUri("https://google.com")))),
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+                size: 22,
+              ),
+              onPressed: () => _webViewController?.goBack(),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.black,
+                size: 22,
+              ),
+              onPressed: () => _webViewController?.goForward(),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.black, size: 28),
+              onPressed: () => _webViewController?.reload(),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.home_outlined,
+                color: Colors.black,
+                size: 28,
+              ),
+              onPressed: () => _webViewController?.loadUrl(
+                urlRequest: URLRequest(url: WebUri("https://google.com")),
+              ),
+            ),
           ],
         ),
       ),

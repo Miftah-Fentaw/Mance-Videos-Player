@@ -52,41 +52,51 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     var videoStatus = await Permission.videos.status;
-     if (!videoStatus.isGranted) {
+    if (!videoStatus.isGranted) {
       await Permission.videos.request();
     }
-     var audioStatus = await Permission.audio.status;
-     if (!audioStatus.isGranted) {
+    var audioStatus = await Permission.audio.status;
+    if (!audioStatus.isGranted) {
       await Permission.audio.request();
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: BottomNavigationBar(
-          iconSize: 25,
-          fixedColor: Colors.black,
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          currentIndex: index,
-          onTap: (int tappedIndex) {
-            setState(() {
-              index = tappedIndex;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.video_library), label: 'Videos'),
-            BottomNavigationBarItem(icon: Icon(Icons.audiotrack), label: 'Audios'),
-            BottomNavigationBarItem(icon: Icon(Icons.browse_gallery_sharp), label: 'Browse'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-          ]),
-      body: Center(
-        child: pages[index],
+        iconSize: 25,
+        fixedColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.transparent,
+        currentIndex: index,
+        onTap: (int tappedIndex) {
+          setState(() {
+            index = tappedIndex;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.video_library),
+            label: 'Videos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.audiotrack),
+            label: 'Audios',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.browse_gallery_sharp),
+            label: 'Browse',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
       ),
+      body: Center(child: pages[index]),
     );
   }
 }
