@@ -71,7 +71,7 @@ class _BrowsePageState extends State<BrowsePage> {
 
             Expanded(
               child: InAppWebView(
-                initialUrlRequest: URLRequest(url: WebUri("https://www.google.com")),
+                initialUrlRequest: URLRequest(url: WebUri("https://www.Youtube.com")),
                 pullToRefreshController: _pullToRefreshController,
                 onWebViewCreated: (controller) {
                   _webViewController = controller;

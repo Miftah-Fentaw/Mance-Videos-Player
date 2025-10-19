@@ -1,11 +1,33 @@
+# Mance Video Player
 
+🎬 Mance Video Player — Lightweight, Multiple files format support, Easy to use;
 
-# Mance-Videos-Player
+![Videos](assets/screenshots/image3.jpg)
 
+---
 
-🎬 Mance Video Player — Lightweight &amp;
+  ## Features 🎬
 
-Fast Flutter Media Player  A simple and efficient video player built with Flutter. 
-Designed for smooth playback, clean UI, and support for common media formats.
- Ideal for offline usage and quick media access.
+   ## Play Local Videos 📁 – Supports videos stored on your device.
 
+   ## Simple & Clean UI ✨ – Easy to navigate and use.
+
+   ## Video Controls ▶️⏸️ – Play, pause, and seek functionality.
+
+   ## Full-Screen Mode 📺 – Watch videos in full screen.
+
+   ## Lightweight ⚡ – Minimal storage and smooth performance.
+
+---
+
+## 📸 Screenshots
+
+| Audio playing | Settings| Internet |
+|-------------|------------|-----------------|
+| ![Audios](assets/screenshots/image1.jpg) | ![Settings](assets/screenshots/image2.jpg) | ![Browsing](assets/screenshots/image4.jpg) |
+
+---
+
+## 🚀 Projects Status 
+
+ ** ongiong .... ** 
