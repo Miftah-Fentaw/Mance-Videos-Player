@@ -25,6 +25,7 @@
 | Audio playing | Settings| Internet |
 |-------------|------------|-----------------|
 | ![Audios](assets/screenshots/image1.jpg) | ![Settings](assets/screenshots/image2.jpg) | ![Browsing](assets/screenshots/image4.jpg) |
+| ![Audios](assets/screenshots/image8.jpg) | ![Settings](assets/screenshots/image5.jpg) | ![Browsing](assets/screenshots/image9.jpg) |
 
 ---
 
