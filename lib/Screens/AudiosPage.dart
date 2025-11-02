@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class AudiosPage extends StatefulWidget {
   const AudiosPage({super.key});
@@ -13,46 +13,82 @@ class AudiosPage extends StatefulWidget {
 }
 
 class _AudiosPageState extends State<AudiosPage> {
-   final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isGridView = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
   String? _currentlyPlaying;
-  late Future<List<File>>? _audioFilesFuture;
+  List<AssetEntity> _audioAssets = [];
   final PanelController _panelController = PanelController();
+  bool _loading = false;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _audioFilesFuture = null;
+    _requestPermissionAndLoadAudios();
   }
 
-  void _pickAudios() {
+  Future<void> _requestPermissionAndLoadAudios() async {
     setState(() {
-      _audioFilesFuture = _loadAudioFiles();
+      _loading = true;
+      _errorMessage = null;
     });
-  }
 
-  Future<List<File>> _loadAudioFiles() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-      allowMultiple: true,
-    );
+    try {
+      final permission = await PhotoManager.requestPermissionExtend();
+      if (!permission.isAuth) {
+        setState(() => _loading = false);
+        return;
+      }
 
-    if (result != null) {
-      return result.paths.map((path) => File(path!)).toList();
-    } else {
-      return [];
+      List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
+        type: RequestType.audio,
+        onlyAll: true,
+      ).timeout(const Duration(seconds: 10));
+
+      if (albums.isNotEmpty) {
+        List<AssetEntity> audios = await albums[0]
+            .getAssetListRange(start: 0, end: 10000)
+            .timeout(const Duration(seconds: 10));
+        setState(() {
+          _audioAssets = audios;
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _audioAssets = [];
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _errorMessage = 'Failed to load audios: $e';
+      });
     }
   }
 
-  void _playAudio(File audioFile) {
+  Future<void> _playAudio(AssetEntity audio) async {
     try {
-      _audioPlayer.setAudioSource(AudioSource.uri(audioFile.uri));
-      _audioPlayer.play();
-      setState(() {
-        _currentlyPlaying = audioFile.path.split('/').last;
-      });
+      File? file = await audio.file;
+      if (file != null) {
+        await _audioPlayer.setAudioSource(AudioSource.uri(file.uri));
+        _audioPlayer.play();
+        setState(() {
+          _currentlyPlaying = file.path.split('/').last;
+        });
+      }
     } catch (e) {
       print("Error playing audio: $e");
     }
+  }
+
+  Future<bool> checkAudioPermission() async {
+    final perm = await PhotoManager.requestPermissionExtend();
+    if (!perm.isAuth) {
+      PhotoManager.openSetting();
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -61,10 +97,10 @@ class _AudiosPageState extends State<AudiosPage> {
     super.dispose();
   }
 
-
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SlidingUpPanel(
         controller: _panelController,
         minHeight: _currentlyPlaying != null ? 60 : 0,
@@ -85,7 +121,10 @@ class _AudiosPageState extends State<AudiosPage> {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
                 onPressed: () => _panelController.close(),
               ),
               Expanded(
@@ -117,7 +156,14 @@ class _AudiosPageState extends State<AudiosPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(icon: const Icon(Icons.skip_previous, color: Colors.black, size: 36), onPressed: () {}),
+            IconButton(
+              icon: const Icon(
+                Icons.skip_previous,
+                color: Colors.black,
+                size: 36,
+              ),
+              onPressed: () {},
+            ),
             StreamBuilder<PlayerState>(
               stream: _audioPlayer.playerStateStream,
               builder: (context, snapshot) {
@@ -134,7 +180,10 @@ class _AudiosPageState extends State<AudiosPage> {
                 );
               },
             ),
-            IconButton(icon: const Icon(Icons.skip_next, color: Colors.black, size: 36), onPressed: () {}),
+            IconButton(
+              icon: const Icon(Icons.skip_next, color: Colors.black, size: 36),
+              onPressed: () {},
+            ),
           ],
         ),
       ],
@@ -144,89 +193,181 @@ class _AudiosPageState extends State<AudiosPage> {
   Widget _buildAudioList() {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, _currentlyPlaying != null ? 70 : 20),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          _currentlyPlaying != null ? 70 : 20,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Mance Player',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Mance Player',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  Align(
-                    alignment: AlignmentGeometry.topRight,
-                    child: Icon(
-                      Icons.help_outline,
-                      color: Colors.black,
-                      size: 28,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'All Videos',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  Row(
-                    children: const [
-                      Icon(Icons.sort, color: Colors.black54),
-                      SizedBox(width: 15),
-                      Icon(Icons.grid_view_outlined, color: Colors.black54),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-            Expanded(
-              child: _audioFilesFuture == null
-                  ? Center(
-                      child: ElevatedButton(
-                        onPressed: _pickAudios,
-                        child: const Text("Import Audios"),
+                ),
+                IconButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Tap a video to play it. Use the toggle to switch between grid/list view.',
+                        ),
+                        duration: Duration(seconds: 2),
                       ),
-                    )
-                  : FutureBuilder<List<File>>(
-                      future: _audioFilesFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return  Center(child: LoadingAnimationWidget.inkDrop(
-                            color: Colors.black,
-                            size: 30
-                          ));
-                        }
-                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No audio files found.'));
-                        }
-                        final audioFiles = snapshot.data!;
-                        return ListView.builder(
-                          itemCount: audioFiles.length,
-                          itemBuilder: (context, index) {
-                            final file = audioFiles[index];
-                            final name = file.path.split('/').last;
-                            return ListTile(
-                              leading: const Icon(Icons.music_note),
-                              title: Text(name),
-                              onTap: () => _playAudio(file),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    );
+                  },
+                  icon: Icon(Icons.help_outline, color: Colors.black, size: 28),
+                ),
+              ],
             ),
+            const SizedBox(height: 25),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'All Audios',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    _isGridView
+                        ? Icons.filter_list_outlined
+                        : Icons.grid_view_outlined,
+                    color: Colors.black54,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isGridView = !_isGridView;
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 25),
+            _loading
+                ? Center(
+                    child: LoadingAnimationWidget.inkDrop(
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                  )
+                : _errorMessage != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(_errorMessage!),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: _requestPermissionAndLoadAudios,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
+                : Expanded(
+                    child: _audioAssets.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("No audio files found."),
+                                const SizedBox(height: 10),
+                                ElevatedButton(
+                                  onPressed: _requestPermissionAndLoadAudios,
+                                  child: const Text('Refresh'),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _isGridView
+                        ? GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  childAspectRatio: 3,
+                                ),
+                            itemCount: _audioAssets.length,
+                            itemBuilder: (context, index) {
+                              final audio = _audioAssets[index];
+                              return FutureBuilder<File?>(
+                                future: audio.file,
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) return Container();
+                                  final fileName = snapshot.data!.path
+                                      .split('/')
+                                      .last;
+                                  return InkWell(
+                                    onTap: () => _playAudio(audio),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.music_note,
+                                            color: Colors.black54,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Text(
+                                              fileName,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : ListView.builder(
+                            itemCount: _audioAssets.length,
+                            itemBuilder: (context, index) {
+                              final audio = _audioAssets[index];
+                              return FutureBuilder<File?>(
+                                future: audio.file,
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) return Container();
+                                  final fileName = snapshot.data!.path
+                                      .split('/')
+                                      .last;
+                                  return ListTile(
+                                    leading: const Icon(
+                                      Icons.music_note,
+                                      color: Colors.black54,
+                                    ),
+                                    title: Text(fileName),
+                                    onTap: () => _playAudio(audio),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                  ),
           ],
         ),
       ),
@@ -252,7 +393,10 @@ class _AudiosPageState extends State<AudiosPage> {
             builder: (context, snapshot) {
               final playing = snapshot.data?.playing ?? false;
               return IconButton(
-                icon: Icon(playing ? Icons.pause : Icons.play_arrow, color: Colors.white),
+                icon: Icon(
+                  playing ? Icons.pause : Icons.play_arrow,
+                  color: Colors.white,
+                ),
                 onPressed: () {
                   playing ? _audioPlayer.pause() : _audioPlayer.play();
                 },
@@ -263,9 +407,7 @@ class _AudiosPageState extends State<AudiosPage> {
             icon: const Icon(Icons.stop, color: Colors.white),
             onPressed: () {
               _audioPlayer.stop();
-              setState(() {
-                _currentlyPlaying = null;
-              });
+              setState(() => _currentlyPlaying = null);
             },
           ),
         ],

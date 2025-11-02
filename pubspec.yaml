@@ -19,15 +19,15 @@ dependencies:
   just_audio: ^0.10.5
   path_provider: ^2.1.5
   flutter_inappwebview: ^6.1.5
-  file_picker: ^10.3.3
   permission_handler: ^12.0.1
   sliding_up_panel: ^2.0.0+1
   icons_launcher: ^3.0.3
   loading_animation_widget: ^1.3.0
+  photo_manager: ^3.7.1
 
 
 icons_launcher:
-  image_path: "assets/mance.png"
+  image_path: "assets/MancePlayer.png"
   platforms:
     android:
       enable: true
@@ -40,6 +40,15 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_native_splash: ^2.4.7
+
+flutter_native_splash:
+  color: "#ffffff"           # background color
+  image: assets/MancePlayer.png      # your logo or image path
+  android: true               # generate for Android
+  ios: true                   # generate for iOS
+  android_gravity: center     # logo position
+  ios_content_mode: scaleAspectFit
 
 
 flutter:

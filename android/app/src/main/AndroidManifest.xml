@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-package="com.example.mance">
+xmlns:tools="http://schemas.android.com/tools">
 
 
 <!-- ✅ Permissions -->
@@ -10,13 +9,15 @@ package="com.example.mance">
     <!-- ⚠️ Deprecated: WRITE/READ_EXTERNAL_STORAGE are restricted on Android 11+ -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29"/>
+    
+    <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> -->
+     
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+
 
     <!-- ⚠️ MANAGE_EXTERNAL_STORAGE requires special approval from Play Store -->
     <!-- Only include if absolutely necessary and not for Play Store apps -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage"/>
 
     <application
         android:label="Mance Player"
@@ -26,7 +27,7 @@ package="com.example.mance">
 
 
         <activity
-            android:name="com.example.mance.MainActivity"
+            android:name="com.miftah.mance.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

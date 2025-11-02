@@ -1,14 +1,10 @@
 pluginManagement {
-    val flutterSdkPath =
-        run {
-            val properties = java.util.Properties()
-            file("local.properties").inputStream().use { properties.load(it) }
-            val flutterSdkPath = properties.getProperty("flutter.sdk")
-            require(flutterSdkPath != null) { "flutter.sdk not set in local.properties" }
-            flutterSdkPath
-        }
+    val flutterSdkPath = File(
+        System.getenv("FLUTTER_ROOT")
+            ?: throw GradleException("FLUTTER_ROOT environment variable not found.")
+    )
 
-    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+    includeBuild("${flutterSdkPath.absolutePath}/packages/flutter_tools/gradle")
 
     repositories {
         google()
@@ -16,6 +12,8 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"

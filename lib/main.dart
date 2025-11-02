@@ -5,6 +5,7 @@ import 'package:mance/Screens/SettingsPage.dart';
 import 'package:mance/Screens/VideosPage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:mance/Screens/Notifications.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _isNotificationEnabled = false;
+
+  @override
   Widget build(BuildContext context) {
-    void _showPrivacyDialog(BuildContext context) {
+    void showPrivacyDialog(BuildContext context) {
       showDialog(
         context: context,
         builder: (context) {
@@ -117,20 +123,36 @@ class SettingsPage extends StatelessWidget {
                 ),
               ),
             ),
-            _buildSettingsTile(
-              icon: Icons.notifications_none_outlined,
-              title: 'Notifications',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NotificationsPage()),
-                );
-              },
+            ListTile(
+              leading: const Icon(Icons.notifications, color: Colors.black54),
+              title: const Text(
+                'Enable Notifications',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+              subtitle: const Text(
+                'Turn on to receive updates',
+                style: TextStyle(color: Colors.grey),
+              ),
+              trailing: Switch(
+                value:
+                    _isNotificationEnabled, // or your variable if you’re managing state
+                onChanged: (value) {
+                  setState(() {
+                    _isNotificationEnabled = value;
+                  });
+                },
+                activeColor: Colors.green,
+                inactiveThumbColor: Colors.grey,
+              ),
             ),
+
             _buildSettingsTile(
               icon: Icons.lock_outline,
               title: 'Privacy & Security',
-              onTap: () => _showPrivacyDialog(context),
+              onTap: () => showPrivacyDialog(context),
             ),
             _buildSettingsDivider(),
             _buildSettingsTile(
