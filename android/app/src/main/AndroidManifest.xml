@@ -5,6 +5,8 @@ xmlns:tools="http://schemas.android.com/tools">
 <!-- ✅ Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- ⚠️ Deprecated: WRITE/READ_EXTERNAL_STORAGE are restricted on Android 11+ -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -25,9 +27,28 @@ xmlns:tools="http://schemas.android.com/tools">
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true">
 
+        <service android:name="com.ryanheise.audioservice.AudioService"
+                 android:foregroundServiceType="mediaPlayback"
+                 android:exported="true"
+                 tools:ignore="Instantiatable">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.intent.action.MEDIA_SESSION" />
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="com.ryanheise.audioservice.MediaButtonReceiver"
+                  android:exported="true"
+                  tools:ignore="Instantiatable">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
 
         <activity
-            android:name="com.miftah.mance.MainActivity"
+            android:name="com.ryanheise.audioservice.AudioServiceActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
