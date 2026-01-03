@@ -16,7 +16,8 @@ dependencies:
   just_audio_background: ^0.0.1-beta.17
   video_player: ^2.10.0
   chewie: ^1.13.0
-  just_audio: ^0.10.5
+  just_audio: ^0.9.36
+  share_plus: ^7.2.1
   path_provider: ^2.1.5
   flutter_inappwebview: ^6.1.5
   permission_handler: ^12.0.1
@@ -24,10 +25,11 @@ dependencies:
   icons_launcher: ^3.0.3
   loading_animation_widget: ^1.3.0
   photo_manager: ^3.7.1
+  provider: ^6.1.5+1
 
 
 icons_launcher:
-  image_path: "assets/MancePlayer.png"
+  image_path: "assets/mance.png"
   platforms:
     android:
       enable: true
@@ -44,7 +46,7 @@ dev_dependencies:
 
 flutter_native_splash:
   color: "#ffffff"           # background color
-  image: assets/MancePlayer.png      # your logo or image path
+  image: assets/mance.png      # your logo or image path
   android: true               # generate for Android
   ios: true                   # generate for iOS
   android_gravity: center     # logo position
@@ -56,7 +58,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/mance.png
-
+    - assets/
 
 
