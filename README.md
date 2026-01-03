@@ -2,7 +2,7 @@
 
 🎬 Mance Video Player — Lightweight, Multiple files format support, Easy to use;
 
-![Videos](assets/screenshots/image3.jpg)
+![Videos](assets/screenshots/image6.png)
 
 ---
 
@@ -12,21 +12,16 @@
 
    ## Simple & Clean UI ✨ – Easy to navigate and use.
 
-   ## Video Controls ▶️⏸️ – Play, pause, and seek functionality.
-
-   ## Full-Screen Mode 📺 – Watch videos in full screen.
-
    ## Lightweight ⚡ – Minimal storage and smooth performance.
 
 ---
 
 ## 📸 Screenshots
 
-| Audio playing | Settings| Internet |
-|-------------|------------|-----------------|
-| ![Audios](assets/screenshots/image1.jpg) | ![Settings](assets/screenshots/image2.jpg) | ![Browsing](assets/screenshots/image4.jpg) |
-| ![Audios](assets/screenshots/image8.jpg) | ![Settings](assets/screenshots/image5.jpg) | ![Browsing](assets/screenshots/image9.jpg) |
+| ![](assets/screenshots/image1.png) | ![](assets/screenshots/image2.png) | ![](assets/screenshots/image3.png) | ![](assets/screenshots/image4.png) | ![](assets/screenshots/image5.png) |
+| :---: | :---: | :---: | :---: | :---: |
 
----
+| ![](assets/screenshots/image7.png) | ![](assets/screenshots/image8.png) | ![](assets/screenshots/image9.png) | ![](assets/screenshots/image10.png) |
+| :---: | :---: | :---: | :---: |
 
 
