@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
+import 'package:mance/Widgets/custom_player_controls.dart';
+import 'package:flutter/services.dart';
 
 class PlayerScreen extends StatefulWidget {
   final File videoFile;
@@ -14,134 +15,66 @@ class PlayerScreen extends StatefulWidget {
 
 class _PlayerScreenState extends State<PlayerScreen> {
   late VideoPlayerController _controller;
-  ChewieController? _chewieController;
+  bool _isInitialized = false;
+  bool _isFullScreen = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(widget.videoFile);
-
-    _controller.initialize().then((_) {
-      _chewieController = ChewieController(
-        videoPlayerController: _controller,
-        autoPlay: true,
-        looping: false,
-        showControls: true,
-        allowFullScreen: true,
-        allowMuting: true,
-      );
-      setState(() {});
-    });
+    _controller = VideoPlayerController.file(widget.videoFile)
+      ..initialize().then((_) {
+        setState(() => _isInitialized = true);
+        _controller.play();
+      });
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _chewieController?.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.black,
-        title: Text(widget.videoFile.path.split('/').last,style: TextStyle(color: Colors.white),),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.fullscreen),
-            onPressed: () async {
-              final position = await _controller.position;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FullScreenPlayer(
-                    videoFile: widget.videoFile,
-                    startPosition: position,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: _chewieController != null && _chewieController!.videoPlayerController.value.isInitialized
-          ? Chewie(controller: _chewieController!)
-          : const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-    );
-  }
-}
-
-
-
-
-
-
-
-class FullScreenPlayer extends StatefulWidget {
-  final File videoFile;
-  final Duration? startPosition;
-
-  const FullScreenPlayer({Key? key, required this.videoFile, this.startPosition}) : super(key: key);
-
-  @override
-  State<FullScreenPlayer> createState() => _FullScreenPlayerState();
-}
-
-class _FullScreenPlayerState extends State<FullScreenPlayer> {
-  late VideoPlayerController _controller;
-  ChewieController? _chewieController;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.file(widget.videoFile);
-
-    _controller.initialize().then((_) {
-      if (widget.startPosition != null) {
-        _controller.seekTo(widget.startPosition!);
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+      if (_isFullScreen) {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+      } else {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       }
-      _chewieController = ChewieController(
-        videoPlayerController: _controller,
-        autoPlay: true,
-        looping: false,
-        allowFullScreen: true,
-        allowMuting: true,
-        showControls: true,
-      );
-      setState(() {});
     });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _chewieController?.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.black,
-        title: Text(widget.videoFile.path.split('/').last,style: TextStyle(color: Colors.white),),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.minimize),
-            onPressed: () => Navigator.pop(context),
-          )
-        ],
+      body: Center(
+        child: _isInitialized
+            ? AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    VideoPlayer(_controller),
+                    CustomVideoControls(
+                      controller: _controller,
+                      title: widget.videoFile.path.split('/').last,
+                      filePath: widget.videoFile.path,
+                      onToggleFullScreen: _toggleFullScreen,
+                    ),
+                  ],
+                ),
+              )
+            : const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
       ),
-      body: _chewieController != null && _chewieController!.videoPlayerController.value.isInitialized
-          ? Chewie(controller: _chewieController!)
-          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

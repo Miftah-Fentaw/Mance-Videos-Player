@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mance/main.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -8,160 +9,111 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _isNotificationEnabled = false;
+  bool _isNotificationEnabled = true;
 
   @override
   Widget build(BuildContext context) {
-    void showPrivacyDialog(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            title: const Text(
-              "Privacy Policy",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            content: SizedBox(
-              height: 300,
-              child: SingleChildScrollView(
-                child: const Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                  "Ut faucibus felis a arcu facilisis, in tincidunt metus bibendum. "
-                  "Donec non lorem id urna interdum congue. Sed gravida, ipsum a luctus feugiat, "
-                  "elit elit semper est, eget laoreet odio augue id ipsum. Vivamus volutpat, "
-                  "nibh at hendrerit commodo, nisl nisi tincidunt mi, vitae auctor dolor lorem nec ex. "
-                  "Phasellus consequat justo non nisl eleifend, non aliquet elit tincidunt. "
-                  "In nec cursus sapien. Integer ultricies purus non eros euismod, ut cursus "
-                  "erat hendrerit. Aenean luctus diam sed sapien mattis aliquet.",
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Close"),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-    void _showAboutDialog(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "About This App",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Mance Player v1.0.0",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    "Developed by Miftah\n@Miftah_Fentaw",
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 15),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Close"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    }
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: ListView(
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Text(
-                'Settings',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+      appBar: AppBar(title: const Text('SETTINGS')),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          const SizedBox(height: 16),
+          _buildSectionHeader(theme, 'Appearance'),
+          _buildSettingsTile(
+            icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            title: 'Dark Mode',
+            trailing: Switch(
+              value: isDark,
+              activeColor: theme.primaryColor,
+              onChanged: (value) {
+                themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
+              },
+            ),
+            onTap: () {},
+          ),
+          const Divider(indent: 52),
+          _buildSectionHeader(theme, 'General'),
+          _buildSettingsTile(
+            icon: Icons.notifications_none_rounded,
+            title: 'Notifications',
+            subtitle: 'New media alerts',
+            trailing: Switch(
+              value: _isNotificationEnabled,
+              activeColor: theme.primaryColor,
+              onChanged: (value) =>
+                  setState(() => _isNotificationEnabled = value),
+            ),
+            onTap: () {},
+          ),
+          const Divider(indent: 52),
+          _buildSettingsTile(
+            icon: Icons.language_rounded,
+            title: 'Language',
+            trailing: Text(
+              'English',
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.notifications, color: Colors.black54),
-              title: const Text(
-                'Enable Notifications',
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
+            onTap: () {},
+          ),
+          const Divider(indent: 52),
+          _buildSectionHeader(theme, 'Information'),
+          _buildSettingsTile(
+            icon: Icons.security_rounded,
+            title: 'Privacy Policy',
+            onTap: () => _showPrivacyDialog(context),
+          ),
+          const Divider(indent: 52),
+          _buildSettingsTile(
+            icon: Icons.info_outline_rounded,
+            title: 'About Mance Player',
+            onTap: () => _showAboutDialog(context),
+          ),
+          const SizedBox(height: 48),
+          Center(
+            child: Column(
+              children: [
+                const Text(
+                  'MANCE PLAYER',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-              subtitle: const Text(
-                'Turn on to receive updates',
-                style: TextStyle(color: Colors.grey),
-              ),
-              trailing: Switch(
-                value:
-                    _isNotificationEnabled, // or your variable if you’re managing state
-                onChanged: (value) {
-                  setState(() {
-                    _isNotificationEnabled = value;
-                  });
-                },
-                activeColor: Colors.green,
-                inactiveThumbColor: Colors.grey,
-              ),
+                const SizedBox(height: 8),
+                Text(
+                  'Version 1.0.0',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
             ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
 
-            _buildSettingsTile(
-              icon: Icons.lock_outline,
-              title: 'Privacy & Security',
-              onTap: () => showPrivacyDialog(context),
-            ),
-            _buildSettingsDivider(),
-            _buildSettingsTile(
-              icon: Icons.info_outline,
-              title: 'About Mance Player',
-              subtitle: 'Version 1.0.0',
-              onTap: () => _showAboutDialog(context),
-            ),
-          ],
+  Widget _buildSectionHeader(ThemeData theme, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 24, 4, 12),
+      child: Text(
+        title.toUpperCase(),
+        style: theme.textTheme.bodySmall?.copyWith(
+          letterSpacing: 2,
+          fontWeight: FontWeight.w900,
+          color: theme.primaryColor.withOpacity(0.7),
+          fontSize: 10,
         ),
       ),
     );
@@ -171,28 +123,71 @@ class _SettingsPageState extends State<SettingsPage> {
     required IconData icon,
     required String title,
     String? subtitle,
+    Widget? trailing,
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black54),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, size: 20, color: Colors.grey[600]),
+      ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w500,
-          color: Colors.black,
-        ),
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
       subtitle: subtitle != null
-          ? Text(subtitle, style: const TextStyle(color: Colors.grey))
+          ? Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            )
           : null,
+      trailing:
+          trailing ??
+          const Icon(Icons.chevron_right_rounded, color: Colors.grey, size: 20),
       onTap: onTap,
     );
   }
 
-  Widget _buildSettingsDivider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Divider(color: Colors.black12, height: 1),
+  void _showPrivacyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Privacy Policy"),
+        content: const SingleChildScrollView(
+          child: Text(
+            "Your privacy is important to us. This app only accesses local media files to play them. No data is collected or shared.",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'Mance Player',
+      applicationVersion: '1.0.0',
+      applicationIcon: const Icon(
+        Icons.play_circle_fill,
+        size: 50,
+        color: Colors.indigo,
+      ),
+      children: [
+        const Text(
+          "A modern, sleek video and audio player built with Flutter.",
+        ),
+      ],
     );
   }
 }
